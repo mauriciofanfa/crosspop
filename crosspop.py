@@ -13,37 +13,15 @@ from statsmodels.stats.multitest import multipletests
 # ------------------------------------------------------------------
 
 def limpar_nome_sheet(nome):
-    """
-    Ajusta o nome da aba no Excel para evitar caracteres inválidos.
-    Mantém no máximo 31 caracteres (limite do Excel).
-    """
     inval = '[]:*?/\\'
     for ch in inval:
         nome = nome.replace(ch, " ")
     return nome[:31]
 
 def calcular_v_cramer(chi2, n, r, k):
-    """
-    Calcula o V de Cramer como medida de associação para tabelas de contingência.
-    
-    Parâmetros:
-        chi2: valor do teste qui-quadrado
-        n: tamanho total da amostra
-        r: número de linhas da tabela
-        k: número de colunas da tabela
-    
-    Retorna:
-        v_cramer (float)
-    """
     return np.sqrt(chi2 / (n * (min(r, k) - 1))) if min(r, k) > 1 else np.nan
 
 def classificar_forca(v, categorias):
-    """
-    Classifica a força da associação com base no valor do V de Cramer
-    e no número de categorias envolvidas.
-    
-    Retorna: string ("Fraca", "Moderada", "Forte", "Muito forte", "Não aplicável")
-    """
     if np.isnan(v):
         return "Não aplicável"
     if categorias <= 2:
@@ -63,10 +41,6 @@ def classificar_forca(v, categorias):
         return "Muito forte"
 
 def gerar_recomendacao(p_aj, v_cramer, n, linhas, colunas):
-    """
-    Gera um texto interpretativo de recomendação para cada cruzamento.
-    Considera p-ajustado, V de Cramer, tamanho da amostra e número de categorias.
-    """
     if np.isnan(v_cramer) or np.isnan(p_aj):
         return "Não aplicável (dados insuficientes)"
     if p_aj >= 0.05:
@@ -97,20 +71,23 @@ def gerar_recomendacao(p_aj, v_cramer, n, linhas, colunas):
 def gerar_heatmap(tabela_percentual, combinada_str, pasta_saida, col1, col2, n_total, v_cramer, forca, chi2, dof, p_chi_aj, significancia):
     """
     Gera e salva um heatmap baseado em percentuais.
-    
-    Parâmetros:
-        tabela_percentual: DataFrame com percentuais
-        combinada_str: DataFrame com strings formatadas (N + %)
-        pasta_saida: caminho para salvar a imagem
-        col1, col2: perguntas cruzadas
-        n_total: total de respostas
-        v_cramer, forca, chi2, dof, p_chi_aj, significancia: estatísticas para subtítulo
     """
+
+    # Se a tabela estiver completamente vazia, cria célula fictícia
+    if tabela_percentual.empty:
+        tabela_percentual = pd.DataFrame([[0]], index=["Sem dados"], columns=["Sem dados"])
+        combinada_str = pd.DataFrame([["0 (0.00%)"]], index=["Sem dados"], columns=["Sem dados"])
+        print(f"⚠ Tabela {col1} x {col2} estava vazia. Criada célula fictícia com 0.")
+
+    # Substituir valores NaN por zeros
+    tabela_percentual = tabela_percentual.fillna(0)
+    combinada_str = combinada_str.fillna("0 (0.00%)")
+
     plt.figure(figsize=(max(8, len(tabela_percentual.columns) * 1.2), 
                         max(6, len(tabela_percentual.index) * 0.7)))
     sns.heatmap(tabela_percentual, annot=combinada_str, fmt="", cmap="Blues",
                 cbar_kws={'label': '%'}, linewidths=1, linecolor="grey", annot_kws={"fontsize":9})
-    
+
     plt.title(f"{col1} / {col2}\n"
               f"N={n_total} | V de Cramer={v_cramer:.2f} ({forca}) | "
               f"Qui²={chi2:.1f}, gl={dof}, p-aj={p_chi_aj:.3g} ({significancia})",
@@ -127,21 +104,14 @@ def gerar_heatmap(tabela_percentual, combinada_str, pasta_saida, col1, col2, n_t
 # ------------------------------------------------------------------
 
 def gerar_crosstables(path_csv, pasta_saida="resultados_crosstables"):
-    """
-    Para cada CSV:
-      - Cria subpasta específica da pesquisa
-      - Gera crosstables em Excel com formatação condicional
-      - Produz 3 versões de heatmaps (total, linha, coluna)
-      - Gera resumo consolidado em Excel com estatísticas e recomendações
-    """
     nome_base = os.path.splitext(os.path.basename(path_csv))[0]
     pasta_pesquisa = os.path.join(pasta_saida, nome_base)
     os.makedirs(pasta_pesquisa, exist_ok=True)
 
     df = pd.read_csv(path_csv)
     df = df.iloc[:, 1:]  # Ignorar primeira coluna (carimbo de data/hora)
+    df = df.fillna("Não")  # Substituir células vazias por "Não"
 
-    # Criar subpastas para heatmaps
     pasta_total = os.path.join(pasta_pesquisa, "heatmaps_total")
     pasta_linha = os.path.join(pasta_pesquisa, "heatmaps_linha")
     pasta_coluna = os.path.join(pasta_pesquisa, "heatmaps_coluna")
@@ -149,7 +119,6 @@ def gerar_crosstables(path_csv, pasta_saida="resultados_crosstables"):
     os.makedirs(pasta_linha, exist_ok=True)
     os.makedirs(pasta_coluna, exist_ok=True)
 
-    # Preparar arquivo Excel
     output_path = os.path.join(pasta_pesquisa, f"{nome_base}_crosstables.xlsx")
     writer = pd.ExcelWriter(output_path, engine="xlsxwriter")
     workbook = writer.book
@@ -159,7 +128,6 @@ def gerar_crosstables(path_csv, pasta_saida="resultados_crosstables"):
     resultados_consolidados = []
     p_vals_chi2, info_chi2 = [], []
 
-    # 1. Coletar estatísticas Qui² para cada par de perguntas
     for col1, col2 in itertools.combinations(df.columns, 2):
         tabela = pd.crosstab(df[col1], df[col2], margins=False)
         if tabela.size > 0:
@@ -167,23 +135,19 @@ def gerar_crosstables(path_csv, pasta_saida="resultados_crosstables"):
             p_vals_chi2.append(p_chi)
             info_chi2.append((col1, col2, tabela, chi2, p_chi, dof))
 
-    # 2. Correção múltipla BH (Benjamini-Hochberg) para Qui²
     if p_vals_chi2:
         _, p_adj_chi2, _, _ = multipletests(p_vals_chi2, alpha=0.05, method="fdr_bh")
     else:
         p_adj_chi2 = []
 
     idx_c = 0
-    # 3. Processar cada combinação de perguntas
     for col1, col2 in itertools.combinations(df.columns, 2):
         tabela = pd.crosstab(df[col1], df[col2], margins=False)
 
-        # Criar tabelas de percentuais: total, por linha e por coluna
-        tabela_total = (tabela / tabela.sum().sum()) * 100
-        tabela_linha = tabela.div(tabela.sum(axis=1), axis=0) * 100
-        tabela_coluna = tabela.div(tabela.sum(axis=0), axis=1) * 100
+        tabela_total = (tabela / tabela.sum().sum()) * 100 if tabela.sum().sum() > 0 else tabela*0
+        tabela_linha = tabela.div(tabela.sum(axis=1), axis=0) * 100 if tabela.sum().sum() > 0 else tabela*0
+        tabela_coluna = tabela.div(tabela.sum(axis=0), axis=1) * 100 if tabela.sum().sum() > 0 else tabela*0
 
-        # Strings formatadas para exibição (N + %)
         combinada_str_total = pd.DataFrame(index=tabela.index, columns=tabela.columns)
         combinada_str_linha = pd.DataFrame(index=tabela.index, columns=tabela.columns)
         combinada_str_coluna = pd.DataFrame(index=tabela.index, columns=tabela.columns)
@@ -191,11 +155,15 @@ def gerar_crosstables(path_csv, pasta_saida="resultados_crosstables"):
         for i, idx in enumerate(tabela.index):
             for j, col in enumerate(tabela.columns):
                 valor_abs = tabela.loc[idx, col]
-                combinada_str_total.iloc[i, j] = f"{valor_abs} ({tabela_total.loc[idx, col]:.2f}%)"
-                combinada_str_linha.iloc[i, j] = f"{valor_abs} ({tabela_linha.loc[idx, col]:.2f}%)"
-                combinada_str_coluna.iloc[i, j] = f"{valor_abs} ({tabela_coluna.loc[idx, col]:.2f}%)"
+                try:
+                    combinada_str_total.iloc[i, j] = f"{valor_abs} ({tabela_total.loc[idx, col]:.2f}%)"
+                    combinada_str_linha.iloc[i, j] = f"{valor_abs} ({tabela_linha.loc[idx, col]:.2f}%)"
+                    combinada_str_coluna.iloc[i, j] = f"{valor_abs} ({tabela_coluna.loc[idx, col]:.2f}%)"
+                except:
+                    combinada_str_total.iloc[i, j] = "0 (0.00%)"
+                    combinada_str_linha.iloc[i, j] = "0 (0.00%)"
+                    combinada_str_coluna.iloc[i, j] = "0 (0.00%)"
 
-        # Estatísticas
         if idx_c < len(info_chi2):
             info = info_chi2[idx_c]
             chi2, p_chi, dof = info[3], info[4], info[5]
@@ -212,12 +180,10 @@ def gerar_crosstables(path_csv, pasta_saida="resultados_crosstables"):
                 v_cramer, forca, significancia, recomendacao
             ])
 
-            # Gerar os três heatmaps
             gerar_heatmap(tabela_total, combinada_str_total, pasta_total, col1, col2, n_total, v_cramer, forca, chi2, dof, p_chi_aj, significancia)
             gerar_heatmap(tabela_linha, combinada_str_linha, pasta_linha, col1, col2, n_total, v_cramer, forca, chi2, dof, p_chi_aj, significancia)
             gerar_heatmap(tabela_coluna, combinada_str_coluna, pasta_coluna, col1, col2, n_total, v_cramer, forca, chi2, dof, p_chi_aj, significancia)
 
-        # 4. Escrever aba Excel com formatação condicional
         sheet_name = limpar_nome_sheet(f"{col1[:15]}_{col2[:15]}")
         combinada_str_total.to_excel(writer, sheet_name=sheet_name)
         worksheet = writer.sheets[sheet_name]
@@ -240,7 +206,6 @@ def gerar_crosstables(path_csv, pasta_saida="resultados_crosstables"):
                 except:
                     worksheet.write(i, j, cell_value)
 
-    # 5. Gerar resumo consolidado em Excel
     resumo_df = pd.DataFrame(resultados_consolidados,
                              columns=["Pergunta 1", "Pergunta 2", "N", "Qui²", "gl", 
                                       "p-aj (Qui²)", "V de Cramer", "Força", 
