@@ -16,6 +16,46 @@ O usuário é responsável por revisar, validar e interpretar os resultados, lev
 
 ---
 
+## ⚠️🚨 Problemas conhecidos
+
+Coluna inicial é ignorada: a primeira coluna do arquivo é desconsiderada (normalmente ID/data). Se seu arquivo não tiver essa coluna, você vai perder uma variável.
+
+Faltantes não são “Não”: respostas em branco/ausentes não significam “não”. Misturar as duas coisas distorce percentuais e testes. Ideal: tratar “Sem resposta” como categoria separada ou remover faltantes antes de rodar.
+
+Categorias com um único valor: se todo mundo respondeu a mesma coisa numa pergunta, os cruzamentos com essa pergunta viram “Não aplicável” (não dá pra testar associação).
+
+Teste Qui-quadrado: o script usa Qui-quadrado para verificar associação entre duas perguntas categóricas. Esse teste pressupõe pelo menos 2 linhas e 2 colunas na tabela e frequências esperadas razoáveis (tipicamente ≥5).
+
+Tabelas pequenas (2×2) com poucas contagens: resultados podem ser instáveis. O script não troca automaticamente para o teste exato de Fisher; trate resultados de 2×2 com muitas células pequenas com cautela.
+
+Múltiplas comparações: como muitos pares são testados, o script ajusta os p-valores pelo método Benjamini–Hochberg (controle de FDR). Ainda assim, com muitos cruzamentos, alguns “significativos” podem aparecer ao acaso.
+
+Tamanho de efeito (V de Cramér): é mostrado junto do p-valor. O V depende do nº de categorias; rótulos “fraco/moderado/forte” são aproximações, não verdades absolutas. Em amostras pequenas, o V pode parecer maior do que é.
+
+Ordem das categorias ignorada: tudo é tratado como nominal. Se suas categorias têm ordem (ex.: “Baixo < Médio < Alto”), isso não é considerado nem nos testes nem na visualização.
+
+Significância ≠ importância prática: p-valor baixo indica associação estatística, não causalidade. Use o V de Cramér e o contexto para julgar relevância.
+
+Percentuais dos heatmaps: há três visões (total, por linha, por coluna). Confira o título/legenda para saber de que universo é o percentual — é comum confundir.
+
+“Não aplicável” não é erro: aparece quando não há variação suficiente para testar (ex.: pergunta com uma única resposta).
+
+Muitos arquivos: o número de cruzamentos cresce rápido (≈ n·(n−1)/2). Com muitas perguntas, espere centenas/milhares de imagens e um Excel grande. Reserve tempo e espaço em disco.
+
+Tempo de execução: tabelas grandes ou muitas categorias tornam a execução mais lenta.
+
+Cruzamentos inválidos podem causar incoerências: em casos com perguntas “constantes”, alguns resultados podem não ser calculados; se notar valores estranhos (por ex., título sem números, p-valor sem sentido), reexecute e verifique se há perguntas com uma única categoria.
+
+Ordem/rotulagem das categorias: os heatmaps podem ordenar categorias alfabeticamente; se isso confundir, reorganize seus dados para impor a ordem desejada antes de rodar.
+
+Limpe faltantes (ou rotule como “Sem resposta”).
+
+Verifique se cada pergunta tem pelo menos duas categorias com contagens razoáveis.
+
+Se o objetivo for tendência/ordem, considere análises específicas (não cobertas por este script).
+
+---
+
 ## 🎓 Contexto acadêmico
 
 Este projeto foi desenvolvido por Mauricio de Souza Fanfa em 2025/1 para analisar dados de questionários (surveys) produzidos pelos discentes da disciplina de **Pesquisa de Opinião Pública** do **Curso de Comunicação Social da Universidade Federal de Santa Maria (UFSM)**.
