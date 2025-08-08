@@ -6,7 +6,7 @@ Ele gera tabelas cruzadas (**crosstables**), gráficos de calor (**heatmaps**) e
 
 ## ⚠️🚨 Importante
 
-Este material tem **fins exclusivamente didáticos**. As análises automatizadas devem ser compreendidas dentro de seu contexto pedagógico. As análises devem ser revisadas.
+Este material tem **fins exclusivamente didáticos**. As análises automatizadas tem uso em contexto pedagógico. As análises devem ser revisadas.
 
 Este material **não substitui análises estatísticas profissionais** e pode conter ou cometer erros.
 
