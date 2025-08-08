@@ -4,7 +4,7 @@ Este projeto automatiza a análise de pesquisas realizadas em formulários (ex.:
 
 Ele gera tabelas cruzadas (**crosstables**), gráficos de calor (**heatmaps**) e notas para facilitar a compreensão das relações entre as respostas.
 
-### Importante
+## ⚠️🚨 Importante
 
 Este material tem **fins exclusivamente didáticos**. As análises automatizadas devem ser compreendidas dentro de seu contexto pedagógico. As análises devem ser revisadas.
 
@@ -18,7 +18,7 @@ Este script foi desenvolvido com apoio do modelo GPT-4o que auxiliou na concepç
 
 O usuário é responsável por revisar, validar e interpretar os resultados, levando em conta que a ferramenta oferece **apoio analítico e não substitui o julgamento humano**.
 
-## ⚠️🚨 Problemas conhecidos
+## Problemas conhecidos
 
 Coluna inicial é ignorada: a primeira coluna do arquivo é desconsiderada (normalmente ID/data). Se seu arquivo não tiver essa coluna, você vai perder uma variável.
 
