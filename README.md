@@ -3,6 +3,29 @@
 Este projeto automatiza a análise de pesquisas realizadas em formulários (ex.: Google Forms).  
 Ele gera tabelas cruzadas (**crosstables**), gráficos de calor (**heatmaps**) e relatórios interpretativos para facilitar a compreensão das relações entre as respostas.
 
+## 🤖 Sobre este projeto
+
+Este script foi desenvolvido com apoio do modelo GPT-4o que auxiliou na concepção, implementação e documentação do código.
+
+O uso de IA buscou:
+- Tornar a análise de dados mais acessível para não especialistas.  
+- Garantir clareza nas explicações estatísticas.  
+- Automatizar tarefas repetitivas de forma ética e transparente.  
+
+O usuário é responsável por revisar, validar e interpretar os resultados, levando em conta que a ferramenta oferece **apoio analítico e não substitui o julgamento humano**.
+
+---
+
+## 🎓 Contexto acadêmico
+
+Este projeto foi desenvolvido por Mauricio de Souza Fanfa em 2025/1 para analisar dados de questionários (surveys) produzidos pelos discentes da disciplina de **Pesquisa de Opinião Pública** do **Curso de Comunicação Social da Universidade Federal de Santa Maria (UFSM)**.
+
+### Importante
+
+Este material tem **fins exclusivamente didáticos**. As análises automatizadas **não substituem a interpretação humana** e devem ser compreendidas dentro de seu contexto acadêmico e pedagógico.
+
+Este material **não substitui análises estatísticas profissionais** e pode conter ou cometer erros.
+
 ---
 
 ## 🚀 O que o script faz
@@ -232,28 +255,3 @@ Este script transforma dados brutos de pesquisas em relatórios ricos e gráfico
 - **Interpretação automática (coluna Recomendação)**
 
 Assim, você consegue identificar rapidamente quais relações entre respostas **merecem atenção** e quais **podem ser descartadas**.
-
----
-
-## 🤖 Sobre este projeto
-
-Este script foi desenvolvido com apoio do modelo GPT-4o que auxiliou na concepção, implementação e documentação do código.
-
-O uso de IA buscou:
-- Tornar a análise de dados mais acessível para não especialistas.  
-- Garantir clareza nas explicações estatísticas.  
-- Automatizar tarefas repetitivas de forma ética e transparente.  
-
-O usuário é responsável por revisar, validar e interpretar os resultados, levando em conta que a ferramenta oferece **apoio analítico e não substitui o julgamento humano**.
-
----
-
-## 🎓 Contexto acadêmico
-
-Este projeto foi desenvolvido por Mauricio de Souza Fanfa em 2025/1 para analisar dados de questionários (surveys) produzidos pelos discentes da disciplina de **Pesquisa de Opinião Pública** do **Curso de Comunicação Social da Universidade Federal de Santa Maria (UFSM)**.
-
-### Importante
-
-Este material tem **fins exclusivamente didáticos**. As análises automatizadas **não substituem a interpretação humana** e devem ser compreendidas dentro de seu contexto acadêmico e pedagógico.
-
-Este material **não substitui análises estatísticas profissionais** e pode conter ou cometer erros.
