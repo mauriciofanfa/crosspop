@@ -4,6 +4,8 @@ Este projeto automatiza a análise de pesquisas realizadas em formulários (ex.:
 
 Ele gera tabelas cruzadas (**crosstables**), gráficos de calor (**heatmaps**) e notas para facilitar a compreensão das relações entre as respostas.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23376034.svg)](https://doi.org/10.5281/zenodo.23376034)
+
 ## ⚠️🚨 Importante
 
 Este material tem **fins exclusivamente didáticos**. As análises automatizadas tem uso em contexto pedagógico. As análises devem ser revisadas.
